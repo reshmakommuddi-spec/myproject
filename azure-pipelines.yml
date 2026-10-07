@@ -23,19 +23,22 @@ steps:
       -Dsonar.organization=reshma-devops1 \
       -Dsonar.projectKey=reshma-devops1_myproject \
       -Dsonar.host.url=https://sonarcloud.io \
-      -Dsonar.python.coverage.reportPaths=coverage.xml || echo "Sonar skipped - no token"
+      -Dsonar.python.coverage.reportPaths=coverage.xml || echo "Sonar skipped"
   displayName: 'SonarCloud Analysis'
   continueOnError: true
 
 - script: |
     mkdir -p $(Build.ArtifactStagingDirectory)/drop
-    echo "<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p>" > $(Build.ArtifactStagingDirectory)/drop/index.html
-  displayName: 'Create Web Page'
+    printf "from flask import Flask\napp = Flask(__name__)\n@app.route('/')\ndef home():\n    return '<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p>'\n" > $(Build.ArtifactStagingDirectory)/drop/app.py
+    echo "flask\ngunicorn" > $(Build.ArtifactStagingDirectory)/drop/requirements.txt
+  displayName: 'Create Flask App'
 
 - task: AzureWebApp@1
   displayName: 'RELEASE - Deploy to Web App'
   inputs:
     azureSubscription: 'azure-rm-connection'
     appType: 'webAppLinux'
-    appName: 'reshmadevops-webapp-2026'
+    appName: 'reshmadevops-webapp-2026-hchpdzd0f8dreka7'
     package: '$(Build.ArtifactStagingDirectory)/drop'
+    runtimeStack: 'PYTHON|3.11'
+    startUpCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
