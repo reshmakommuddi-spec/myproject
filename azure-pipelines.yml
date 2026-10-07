@@ -3,7 +3,7 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 steps:
-- task: SonarCloudPrepare@2
+- task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'
     organization: 'reshma-devops1'
@@ -21,9 +21,9 @@ steps:
     pytest --maxfail=1 --disable-warnings -q --cov=. --cov-report=xml || echo "No tests"
   displayName: 'Run tests with coverage'
   continueOnError: true
-- task: SonarCloudAnalyze@2
+- task: SonarCloudAnalyze@1
   displayName: 'Run SonarCloud analysis'
-- task: SonarCloudPublish@2
+- task: SonarCloudPublish@1
   inputs:
     pollingTimeoutSec: '300'
   displayName: 'Publish results'
