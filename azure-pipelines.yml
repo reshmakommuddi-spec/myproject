@@ -23,25 +23,18 @@ steps:
       -Dsonar.organization=reshma-devops1 \
       -Dsonar.projectKey=reshma-devops1_myproject \
       -Dsonar.host.url=https://sonarcloud.io \
-      -Dsonar.sources=.
-  displayName: 'SonarCloud Scan'
-  env:
-    SONAR_TOKEN: $(SONAR_TOKEN)
+      -Dsonar.python.coverage.reportPaths=coverage.xml
+  displayName: 'SonarCloud Analysis'
 
-# --- NEW OPTIMIZED PART ---
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: |
-      **/*.py
-      README.md
-      requirements.txt
-      azure-pipelines.yml
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  displayName: 'Copy only code files'
+- script: |
+    mkdir -p $(Build.ArtifactStagingDirectory)/drop
+    echo "<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p>" > $(Build.ArtifactStagingDirectory)/drop/index.html
+  displayName: 'Create Web Page'
 
-- task: PublishPipelineArtifact@1
+- task: AzureWebApp@1
+  displayName: 'RELEASE - Deploy to Web App'
   inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: 'drop-main'
-  displayName: 'Publish Small Artifact'
+    azureSubscription: 'azure-rm-connection'
+    appType: 'webAppLinux'
+    appName: 'reshmadevops-webapp-2026-hchpdzd0f8dreka7'
+    package: '$(Build.ArtifactStagingDirectory)/drop'
