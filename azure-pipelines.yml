@@ -8,7 +8,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt || true
-    pip install pytest pytest-cov
+    pip install pytest pytest-cov flask gunicorn
   displayName: 'Install deps'
 
 - script: |
@@ -16,21 +16,10 @@ steps:
   displayName: 'Run tests'
 
 - script: |
-    wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
-    unzip -q sonar-scanner-cli-6.2.1.4610-linux-x64.zip
-    export PATH=$(pwd)/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH
-    sonar-scanner \
-      -Dsonar.organization=reshma-devops1 \
-      -Dsonar.projectKey=reshma-devops1_myproject \
-      -Dsonar.host.url=https://sonarcloud.io \
-      -Dsonar.python.coverage.reportPaths=coverage.xml || echo "Sonar skipped"
-  displayName: 'SonarCloud Analysis'
-  continueOnError: true
-
-- script: |
     mkdir -p $(Build.ArtifactStagingDirectory)/drop
-    printf "from flask import Flask\napp = Flask(__name__)\n@app.route('/')\ndef home():\n    return '<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p>'\n" > $(Build.ArtifactStagingDirectory)/drop/app.py
-    echo "flask\ngunicorn" > $(Build.ArtifactStagingDirectory)/drop/requirements.txt
+    printf "from flask import Flask\napp = Flask(__name__)\n@app.route('/')\ndef home():\n    return '<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE!</p>'\n" > $(Build.ArtifactStagingDirectory)/drop/app.py
+    echo "flask
+    gunicorn" > $(Build.ArtifactStagingDirectory)/drop/requirements.txt
   displayName: 'Create Flask App'
 
 - task: AzureWebApp@1
@@ -38,7 +27,8 @@ steps:
   inputs:
     azureSubscription: 'azure-rm-connection'
     appType: 'webAppLinux'
-    appName: 'reshmadevops-webapp-2026-hchpdzd0f8dreka7'
+    appName: 'reshmadevops-webapp-2026'
+    resourceGroupName: 'reshmadevops-rg'
     package: '$(Build.ArtifactStagingDirectory)/drop'
     runtimeStack: 'PYTHON|3.11'
     startUpCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
