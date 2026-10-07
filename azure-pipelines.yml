@@ -29,7 +29,7 @@ steps:
 
 - script: |
     mkdir -p $(Build.ArtifactStagingDirectory)/drop
-    echo "<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p><p>Deployed via Azure DevOps</p>" > $(Build.ArtifactStagingDirectory)/drop/index.html
+    echo "<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE - Release Pipeline Working!</p>" > $(Build.ArtifactStagingDirectory)/drop/index.html
   displayName: 'Create Web Page'
 
 - task: AzureWebApp@1
@@ -37,5 +37,5 @@ steps:
   inputs:
     azureSubscription: 'azure-rm-connection'
     appType: 'webAppLinux'
-    appName: 'reshmadevops-webapp-2026-hchpdzd0f8dreka7'
+    appName: 'reshmadevops-webapp-2026'
     package: '$(Build.ArtifactStagingDirectory)/drop'
