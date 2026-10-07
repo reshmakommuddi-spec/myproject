@@ -28,8 +28,20 @@ steps:
   env:
     SONAR_TOKEN: $(SONAR_TOKEN)
 
+# --- NEW OPTIMIZED PART ---
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: |
+      **/*.py
+      README.md
+      requirements.txt
+      azure-pipelines.yml
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy only code files'
+
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
     artifact: 'drop-main'
-  displayName: 'Publish Artifact'
+  displayName: 'Publish Small Artifact'
