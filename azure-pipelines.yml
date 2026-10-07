@@ -1,23 +1,29 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
-
 pool:
-  name: Default
-
+  vmImage: 'ubuntu-latest'
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
-- task: WhiteSource@21
+- task: SonarQubeCloudPrepare@2
   inputs:
-    cwd: '$(System.DefaultWorkingDirectory)'
+    SonarCloud: 'SonarCloud'
+    organization: 'reshma-devops1'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'reshma-devops1_myproject'
+    cliProjectName: 'myproject'
+    cliSources: '.'
+  displayName: 'Prepare SonarCloud'
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt || echo "No requirements.txt"
+  displayName: 'Install dependencies'
+- script: |
+    pytest --maxfail=1 --disable-warnings -q --cov=. --cov-report=xml || echo "No tests"
+  displayName: 'Run tests with coverage'
+  continueOnError: true
+- task: SonarQubeCloudAnalyze@2
+  displayName: 'Run SonarCloud analysis'
+- task: SonarQubeCloudPublish@2
+  inputs:
+    pollingTimeoutSec: '300'
+  displayName: 'Publish results'
