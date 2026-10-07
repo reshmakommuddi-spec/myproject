@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-22.04'
 
 steps:
 - script: |
@@ -27,3 +27,9 @@ steps:
   displayName: 'SonarCloud Scan'
   env:
     SONAR_TOKEN: $(SONAR_TOKEN)
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)'
+    artifact: 'drop-main'
+  displayName: 'Publish Artifact'
