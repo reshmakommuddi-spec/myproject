@@ -1,29 +1,35 @@
 trigger:
 - main
+
 pool:
   vmImage: 'ubuntu-latest'
+
 steps:
-- task: SonarCloudPrepare@1
+- task: SonarQubeCloudPrepare@2
   inputs:
-    SonarCloud: 'SonarCloud'
+    SonarQubeCloud: 'SonarCloud'
     organization: 'reshma-devops1'
     scannerMode: 'CLI'
     configMode: 'manual'
     cliProjectKey: 'reshma-devops1_myproject'
     cliProjectName: 'myproject'
     cliSources: '.'
-  displayName: 'Prepare SonarCloud'
+
 - script: |
     python -m pip install --upgrade pip
-    pip install -r requirements.txt || echo "No requirements.txt"
-  displayName: 'Install dependencies'
+    pip install -r requirements.txt || echo "no requirements"
+    pip install pytest pytest-cov
+  displayName: 'Install deps'
+
 - script: |
-    pytest --maxfail=1 --disable-warnings -q --cov=. --cov-report=xml || echo "No tests"
-  displayName: 'Run tests with coverage'
+    pytest --cov=. --cov-report=xml -q || echo "no tests"
+  displayName: 'Run tests'
   continueOnError: true
-- task: SonarCloudAnalyze@1
-  displayName: 'Run SonarCloud analysis'
-- task: SonarCloudPublish@1
+
+- task: SonarQubeCloudAnalyze@2
+  displayName: 'Run SonarQube Analysis'
+
+- task: SonarQubeCloudPublish@2
   inputs:
     pollingTimeoutSec: '300'
-  displayName: 'Publish results'
+  displayName: 'Publish Results'
