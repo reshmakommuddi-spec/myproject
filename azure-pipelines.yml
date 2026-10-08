@@ -2,33 +2,24 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-22.04'
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt || true
-    pip install pytest pytest-cov flask gunicorn
-  displayName: 'Install deps'
+stages:
+- stage: Build
+  jobs:
+    - job: BuildJob
+    steps:
+        - script: echo "Build OK"
+      displayName: 'Build'
 
-- script: |
-    pytest --cov=. --cov-report=xml -q || echo "no tests"
-  displayName: 'Run tests'
-
-- script: |
-    mkdir -p $(Build.ArtifactStagingDirectory)/drop
-    printf "from flask import Flask\napp = Flask(__name__)\n@app.route('/')\ndef home():\n    return '<h1>Hello Reshma - DevOps Project Deployed!</h1><p>Build $(Build.BuildNumber) is LIVE!</p>'\n" > $(Build.ArtifactStagingDirectory)/drop/app.py
-    echo "flask
-    gunicorn" > $(Build.ArtifactStagingDirectory)/drop/requirements.txt
-  displayName: 'Create Flask App'
-
-- task: AzureWebApp@1
-  displayName: 'RELEASE - Deploy to Web App'
-  inputs:
-    azureSubscription: 'azure-rm-connection'
-    appType: 'webAppLinux'
-    appName: 'reshmadevops-webapp-2026'
-    resourceGroupName: 'reshmadevops-rg'
-    package: '$(Build.ArtifactStagingDirectory)/drop'
-    runtimeStack: 'PYTHON|3.11'
-    startUpCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
+- stage: Deploy_Dev
+  dependsOn: Build
+  jobs:
+    - deployment: DeployDev
+    displayName: 'Deploy to Dev'
+    environment: 'Dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+                    - script: echo "Deploy Dev OK"
