@@ -6,7 +6,7 @@ stages:
   - job: BuildJob
     pool: 
       vmImage: ubuntu-latest
-    steps:
+      steps:
     - script: echo Build OK
 - stage: Deploy_Dev
   dependsOn: Build
@@ -14,7 +14,7 @@ stages:
   - job: DeployDev
     pool:
       vmImage: ubuntu-latest
-    steps:
+      steps:
     - script: echo Deploy Dev OK
 - stage: Deploy_QA
   dependsOn: Deploy_Dev
@@ -22,14 +22,14 @@ stages:
   - job: DeployQA
     pool:
       vmImage: ubuntu-latest
-    steps:
+      steps:
     - script: echo Deploy QA OK
 - stage: Depoly_Prod
    dependsOn: Deploy_QA
-   jobs:
-   - job: DeployProd
+  jobs:
+  - job: DeployProd
     pool:
       vmImage: ubuntu-latest
-    steps:  
+      steps:  
       
 
