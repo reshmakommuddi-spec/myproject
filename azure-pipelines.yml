@@ -3,32 +3,33 @@ trigger: none
 stages:
 - stage: Build
   jobs:
-    - job: BuildJob
-    pool:
+  - job: BuildJob
+    pool: 
       vmImage: ubuntu-latest
     steps:
-        - script: echo Build OK
+    - script: echo Build OK
 - stage: Deploy_Dev
   dependsOn: Build
   jobs:
-    - job: DeployDev
+  - job: DeployDev
     pool:
       vmImage: ubuntu-latest
     steps:
-        - script: echo Deploy Dev OK
+    - script: echo Deploy Dev OK
 - stage: Deploy_QA
   dependsOn: Deploy_Dev
   jobs:
-    - job: DeployQA
+  - job: DeployQA
     pool:
       vmImage: ubuntu-latest
     steps:
-        - script: echo Deploy QA OK
-- stage: Deploy_Prod
-  dependsOn: Deploy_QA
-  jobs:
-    - job: DeployProd
+    - script: echo Deploy QA OK
+- stage: Depoly_Prod
+   dependsOn: Deploy_QA
+   jobs:
+   - job: DeployProd
     pool:
       vmImage: ubuntu-latest
-    steps:
-        - script: echo Deploy Prod OK
+    steps:  
+      
+
