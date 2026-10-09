@@ -8,27 +8,27 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - script: echo Build OK
-- stage: Deploy_Dew
+- stage: Dev
   dependsOn: Build
-  jobs: 
-  - job: DeployDev
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - script: echo Deploy Dev OK
-- stage: Deploy_QA
-  dependsOn: Deploy_Dev
   jobs:
-  - job: Deplo{QA
+  - job: DevJob
     pool:
       vmImage: ubuntu-latest
     steps:
-    - script: echo Deploy QA Ok
-- stage: Deploy_Prod
-  dependsOn: Deploy_QA
-  jobs: 
-  - job: DeployProd
+    - script: echo Dev OK
+- stage: QA
+  dependsOn: Dev
+  jobs:
+  - job: QAJob
     pool:
       vmImage: ubuntu-latest
     steps:
-    - script: echo Deploy Prod OK
+    - script: echo QA OK
+- stage: Prod
+  dependsOn: QA
+  jobs:
+  - job: ProdJob
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - script: echo Prod OK
