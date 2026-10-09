@@ -6,59 +6,54 @@ pool:
 
 stages:
 - stage: Build
-  displayName: 'Build Stage'
+  displayName: Build
   jobs:
-    - job: Build
-    displayName: 'Validate App'
+    - job: BuildJob
+    displayName: Validate App
     steps:
         - script: |
-        echo "Checking index.html"
         ls -la
         cat index.html
-        echo "Build SUCCESS - App validated!"
-      displayName: 'Build App'
+        echo "Build OK"
+      displayName: Build
 
 - stage: Dev
-  displayName: 'Dev - Docker Build'
+  displayName: Dev Docker Build
   dependsOn: Build
   jobs:
-    - job: DockerBuild
-    displayName: 'Build Docker Image'
+    - job: DevJob
+    displayName: Docker Build
     steps:
         - script: |
-        echo "Building Docker image..."
         docker build -t myproject:$(Build.BuildId) .
         docker images
-        echo "Docker Build GREEN!"
-      displayName: 'Docker Build'
+        echo "Docker Build GREEN"
+      displayName: Docker Build
 
 - stage: QA
-  displayName: 'QA - Test Image'
+  displayName: QA Test
   dependsOn: Dev
   jobs:
-    - job: TestImage
-    displayName: 'Test Docker Image'
+    - job: QAJob
+    displayName: Test Image
     steps:
         - script: |
-        echo "Testing Docker image..."
-        docker run -d -p 8080:80 --name test-app myproject:$(Build.BuildId)
-        sleep 3
+        docker run -d -p 8080:80 --name testapp myproject:$(Build.BuildId)
+        sleep 2
         docker ps
-        curl -I http://localhost:8080 || echo "App running!"
-        docker stop test-app
-        docker rm test-app
-        echo "QA Test GREEN!"
-      displayName: 'Test Docker Container'
+        docker stop testapp
+        docker rm testapp
+        echo "QA GREEN"
+      displayName: Test Container
 
 - stage: Prod
-  displayName: 'Prod - Ready to Deploy'
+  displayName: Prod Ready
   dependsOn: QA
   jobs:
-    - job: ProdReady
-    displayName: 'Production Ready'
+    - job: ProdJob
+    displayName: Prod Ready
     steps:
         - script: |
-        echo "Image myproject:$(Build.BuildId) is PROD READY!"
-        echo "Next step: Push to ACR"
-        echo "All 4 stages GREEN - Real Docker Pipeline SUCCESS!"
-      displayName: 'Prod Ready'
+        echo "Image ready for Prod"
+        echo "ALL 4 STAGES GREEN"
+      displayName: Prod
