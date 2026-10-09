@@ -1,0 +1,28 @@
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+stages:
+- stage: Build
+  jobs:
+    - job: BuildJob
+    steps:
+        - script: echo Build OK
+- stage: Dev
+  dependsOn: Build
+  jobs:
+    - job: DevJob
+    steps:
+        - script: docker build -t myproject:$(Build.BuildId) .
+- stage: QA
+  dependsOn: Dev
+  jobs:
+    - job: QAJob
+    steps:
+        - script: echo QA OK
+- stage: Prod
+  dependsOn: QA
+  jobs:
+    - job: ProdJob
+    steps:
+        - script: echo Prod OK
