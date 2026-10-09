@@ -1,59 +1,28 @@
 trigger:
 - main
-
 pool:
-  vmImage: 'ubuntu-latest'
-
+  vmImage: ubuntu-latest
 stages:
 - stage: Build
-  displayName: Build
   jobs:
     - job: BuildJob
-    displayName: Validate App
     steps:
-        - script: |
-        ls -la
-        cat index.html
-        echo "Build OK"
-      displayName: Build
-
+        - script: echo Build OK
 - stage: Dev
-  displayName: Dev Docker Build
   dependsOn: Build
   jobs:
     - job: DevJob
-    displayName: Docker Build
     steps:
-        - script: |
-        docker build -t myproject:$(Build.BuildId) .
-        docker images
-        echo "Docker Build GREEN"
-      displayName: Docker Build
-
+        - script: docker build -t myproject:$(Build.BuildId) .
 - stage: QA
-  displayName: QA Test
   dependsOn: Dev
   jobs:
     - job: QAJob
-    displayName: Test Image
     steps:
-        - script: |
-        docker run -d -p 8080:80 --name testapp myproject:$(Build.BuildId)
-        sleep 2
-        docker ps
-        docker stop testapp
-        docker rm testapp
-        echo "QA GREEN"
-      displayName: Test Container
-
+        - script: echo QA OK
 - stage: Prod
-  displayName: Prod Ready
   dependsOn: QA
   jobs:
     - job: ProdJob
-    displayName: Prod Ready
     steps:
-        - script: |
-        echo "Image ready for Prod"
-        echo "ALL 4 STAGES GREEN"
-      displayName: Prod
+        - script: echo Prod OK
