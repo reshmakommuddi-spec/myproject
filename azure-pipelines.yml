@@ -13,7 +13,9 @@ stages:
   jobs:
     - job: DevJob
     steps:
-        - script: docker build -t myproject:$(Build.BuildId) .
+        - script: |
+        echo Building Docker
+        docker build -t myproject .
 - stage: QA
   dependsOn: Dev
   jobs:
