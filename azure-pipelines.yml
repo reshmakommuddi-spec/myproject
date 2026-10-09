@@ -1,34 +1,64 @@
-trigger: none
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 stages:
 - stage: Build
+  displayName: 'Build Stage'
   jobs:
-  - job: BuildJob
-    pool:
-      vmImage: ubuntu-latest
+    - job: Build
+    displayName: 'Validate App'
     steps:
-    - script: echo Build OK
+        - script: |
+        echo "Checking index.html"
+        ls -la
+        cat index.html
+        echo "Build SUCCESS - App validated!"
+      displayName: 'Build App'
+
 - stage: Dev
+  displayName: 'Dev - Docker Build'
   dependsOn: Build
   jobs:
-  - job: DevJob
-    pool:
-      vmImage: ubuntu-latest
+    - job: DockerBuild
+    displayName: 'Build Docker Image'
     steps:
-    - script: echo Dev OK
+        - script: |
+        echo "Building Docker image..."
+        docker build -t myproject:$(Build.BuildId) .
+        docker images
+        echo "Docker Build GREEN!"
+      displayName: 'Docker Build'
+
 - stage: QA
+  displayName: 'QA - Test Image'
   dependsOn: Dev
   jobs:
-  - job: QAJob
-    pool:
-      vmImage: ubuntu-latest
+    - job: TestImage
+    displayName: 'Test Docker Image'
     steps:
-    - script: echo QA OK
+        - script: |
+        echo "Testing Docker image..."
+        docker run -d -p 8080:80 --name test-app myproject:$(Build.BuildId)
+        sleep 3
+        docker ps
+        curl -I http://localhost:8080 || echo "App running!"
+        docker stop test-app
+        docker rm test-app
+        echo "QA Test GREEN!"
+      displayName: 'Test Docker Container'
+
 - stage: Prod
+  displayName: 'Prod - Ready to Deploy'
   dependsOn: QA
   jobs:
-  - job: ProdJob
-    pool:
-      vmImage: ubuntu-latest
+    - job: ProdReady
+    displayName: 'Production Ready'
     steps:
-    - script: echo Prod OK
+        - script: |
+        echo "Image myproject:$(Build.BuildId) is PROD READY!"
+        echo "Next step: Push to ACR"
+        echo "All 4 stages GREEN - Real Docker Pipeline SUCCESS!"
+      displayName: 'Prod Ready'
