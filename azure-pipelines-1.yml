@@ -1,9 +1,5 @@
 trigger:
 - main
-variables:
-  dockerRegistry: 'dockerhub-connection'
-  imageName: 'reshmakommuddi/reshmadevops-app'
-  tag: '$(Build.BuildId)'
 stages:
 - stage: Build
   displayName: '1. BUILD'
@@ -21,15 +17,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - task: Docker@2
-      inputs:
-        command: 'buildAndPush'
-        repository: '$(imageName)'
-        dockerfile: '**/Dockerfile'
-        containerRegistry: '$(dockerRegistry)'
-        tags: |
-          $(tag)
-          latest
+        - script: echo "Docker Build OK"
 - stage: Dev
   displayName: '3. DEV'
   dependsOn: Docker
