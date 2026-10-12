@@ -8,7 +8,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "Build OK"
+        - script: echo Build OK
 - stage: Docker
   displayName: '2. DOCKER'
   dependsOn: Build
@@ -17,7 +17,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "Docker Build OK"
+        - script: echo Docker OK
 - stage: Dev
   displayName: '3. DEV'
   dependsOn: Docker
@@ -26,7 +26,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "DEV"
+        - script: echo Dev OK
 - stage: QA
   displayName: '4. QA'
   dependsOn: Dev
@@ -35,17 +35,13 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "QA"
+        - script: echo QA OK
 - stage: Prod
   displayName: '5. PROD'
   dependsOn: QA
   jobs:
-    - deployment: ProdJob
-    environment: 'Prod'
+    - job: ProdJob
     pool:
       vmImage: 'ubuntu-latest'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-                    - script: echo "PROD LIVE"
+    steps:
+        - script: echo Prod OK
