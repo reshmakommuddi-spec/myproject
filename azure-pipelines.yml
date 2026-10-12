@@ -1,0 +1,47 @@
+trigger:
+- main
+stages:
+- stage: Build
+  displayName: '1. BUILD'
+  jobs:
+    - job: BuildJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - script: echo Build OK
+- stage: Docker
+  displayName: '2. DOCKER'
+  dependsOn: Build
+  jobs:
+    - job: DockerJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - script: echo Docker OK
+- stage: Dev
+  displayName: '3. DEV'
+  dependsOn: Docker
+  jobs:
+    - job: DevJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - script: echo Dev OK
+- stage: QA
+  displayName: '4. QA'
+  dependsOn: Dev
+  jobs:
+    - job: QAJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - script: echo QA OK
+- stage: Prod
+  displayName: '5. PROD'
+  dependsOn: QA
+  jobs:
+    - job: ProdJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - script: echo Prod OK
