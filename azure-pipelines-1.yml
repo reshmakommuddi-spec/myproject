@@ -1,0 +1,19 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'reshmakommuddi/reshmadevops-app'
+
+steps:
+- task: Docker@2
+  displayName: 'Build and Push to Docker Hub'
+  inputs:
+    command: 'buildAndPush'
+    repository: '$(imageName)'
+    dockerfile: '**/Dockerfile'
+    containerRegistry: 'dockerhub-connection'
+    tags: |
+      latest
