@@ -1,19 +1,88 @@
 trigger:
 - main
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
+  dockerRegistry: 'dockerhub-connection'
   imageName: 'reshmakommuddi/reshmadevops-app'
+  tag: '$(Build.BuildId)'
 
-steps:
-- task: Docker@2
-  displayName: 'Build and Push to Docker Hub'
-  inputs:
-    command: 'buildAndPush'
-    repository: '$(imageName)'
-    dockerfile: '**/Dockerfile'
-    containerRegistry: 'dockerhub-connection'
-    tags: |
-      latest
+stages:
+- stage: Build
+  displayName: '1. BUILD'
+  jobs:
+    - job: BuildAndAnalyze
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - task: SonarCloudPrepare@2
+      inputs:
+        SonarCloud: 'SonarCloud'
+        organization: 'reshmakommuddi'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'reshmakommuddi_spec'
+        cliProjectName: 'spec'
+        - script: ls -la
+      displayName: 'Build'
+        - task: SonarCloudAnalyze@2
+      inputs:
+        jdkversion: 'JAVA_HOME_21_X64'
+        - task: SonarCloudPublish@2
+      inputs:
+        pollingTimeoutSec: '300'
+- stage: Docker
+  displayName: '2. DOCKER PUSH'
+  dependsOn: Build
+  jobs:
+    - job: DockerJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+        - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        repository: '$(imageName)'
+        dockerfile: '**/Dockerfile'
+        containerRegistry: '$(dockerRegistry)'
+        tags: |
+          $(tag)
+          latest
+- stage: Dev
+  displayName: '3. DEV'
+  dependsOn: Docker
+  jobs:
+    - deployment: DeployDev
+    environment: 'Dev'
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+                    - script: echo "DEV OK"
+- stage: QA
+  displayName: '4. QA'
+  dependsOn: Dev
+  jobs:
+    - deployment: DeployQA
+    environment: 'QA'
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+                    - script: echo "QA OK"
+- stage: Prod
+  displayName: '5. PROD'
+  dependsOn: QA
+  jobs:
+    - deployment: DeployProd
+    environment: 'Prod'
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+                    - script: echo "PROD LIVE"
