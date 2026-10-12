@@ -3,46 +3,45 @@ trigger:
 
 stages:
 - stage: Build
-  displayName: Build
   jobs:
     - job: BuildJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: ubuntu-latest
     steps:
         - script: echo Build OK
+
 - stage: Docker
-  displayName: Docker
   dependsOn: Build
   jobs:
     - job: DockerJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: ubuntu-latest
     steps:
         - script: echo Docker OK
+
 - stage: Dev
-  displayName: Dev
   dependsOn: Docker
   jobs:
     - job: DevJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: ubuntu-latest
     steps:
         - script: echo Dev OK
+
 - stage: QA
-  displayName: QA
   dependsOn: Dev
   jobs:
     - job: QAJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: ubuntu-latest
     steps:
         - script: echo QA OK
+
 - stage: Prod
-  displayName: Prod
   dependsOn: QA
   jobs:
     - job: ProdJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: ubuntu-latest
     steps:
         - script: echo Prod OK
