@@ -6,6 +6,7 @@ variables:
   tag: '$(Build.BuildId)'
 stages:
 - stage: Build
+  displayName: '1. BUILD'
   jobs:
     - job: BuildJob
     pool:
@@ -13,7 +14,7 @@ stages:
     steps:
         - script: echo "Build OK"
 - stage: Docker
-  displayName: 'Docker Push'
+  displayName: '2. DOCKER'
   dependsOn: Build
   jobs:
     - job: DockerJob
@@ -30,22 +31,25 @@ stages:
           $(tag)
           latest
 - stage: Dev
+  displayName: '3. DEV'
   dependsOn: Docker
   jobs:
     - job: DevJob
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "DEV OK"
+        - script: echo "DEV"
 - stage: QA
+  displayName: '4. QA'
   dependsOn: Dev
   jobs:
     - job: QAJob
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-        - script: echo "QA OK"
+        - script: echo "QA"
 - stage: Prod
+  displayName: '5. PROD'
   dependsOn: QA
   jobs:
     - deployment: ProdJob
