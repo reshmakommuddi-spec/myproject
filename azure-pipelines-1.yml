@@ -1,11 +1,9 @@
 trigger:
 - main
-
 variables:
   dockerRegistry: 'dockerhub-connection'
   imageName: 'reshmakommuddi/reshmadevops-app'
   tag: '$(Build.BuildId)'
-
 stages:
 - stage: Build
   displayName: '1. BUILD'
@@ -15,7 +13,6 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:
         - script: echo "Build OK"
-
 - stage: Docker
   displayName: '2. DOCKER'
   dependsOn: Build
@@ -33,7 +30,6 @@ stages:
         tags: |
           $(tag)
           latest
-
 - stage: Dev
   displayName: '3. DEV'
   dependsOn: Docker
@@ -43,7 +39,6 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:
         - script: echo "DEV"
-
 - stage: QA
   displayName: '4. QA'
   dependsOn: Dev
@@ -53,7 +48,6 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:
         - script: echo "QA"
-
 - stage: Prod
   displayName: '5. PROD'
   dependsOn: QA
